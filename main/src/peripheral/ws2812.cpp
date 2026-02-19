@@ -2,10 +2,17 @@
 #include "logger.h"
 #include "memory.h"
 #include "driver/ledc.h"
+#include "soc/soc_caps.h"
 
 CWS2812Ctrl* CWS2812Ctrl::_instance = nullptr;
 
 #define RMT_RESOLUTION_HZ 10000000 // 10MHz resolution, 1 tick = 0.1us (led strip needs a high resolution)
+
+#if defined(SOC_LEDC_SUPPORT_HS_MODE) && SOC_LEDC_SUPPORT_HS_MODE
+static constexpr ledc_mode_t kLedcSpeedMode = LEDC_HIGH_SPEED_MODE;
+#else
+static constexpr ledc_mode_t kLedcSpeedMode = LEDC_LOW_SPEED_MODE;
+#endif
 
 enum CMD_TYPE {
     SETRGB = 0,
@@ -144,7 +151,7 @@ bool CWS2812Ctrl::init_ledc()
     esp_err_t ret;
 
     ledc_timer_config_t ledc_timer_cfg;
-    ledc_timer_cfg.speed_mode = LEDC_HIGH_SPEED_MODE;
+    ledc_timer_cfg.speed_mode = kLedcSpeedMode;
     ledc_timer_cfg.duty_resolution = LEDC_TIMER_10_BIT;
     ledc_timer_cfg.timer_num = LEDC_TIMER_0;
     ledc_timer_cfg.freq_hz = LED_PWM_FREQUENCY;
@@ -157,7 +164,7 @@ bool CWS2812Ctrl::init_ledc()
 
     ledc_channel_config_t ledc_ch_cfg;
     ledc_ch_cfg.gpio_num = GPIO_PIN_WS2812_PWM;
-    ledc_ch_cfg.speed_mode = LEDC_HIGH_SPEED_MODE;
+    ledc_ch_cfg.speed_mode = kLedcSpeedMode;
     ledc_ch_cfg.channel = LEDC_CHANNEL_0;
     ledc_ch_cfg.intr_type = LEDC_INTR_DISABLE;
     ledc_ch_cfg.timer_sel = LEDC_TIMER_0;
@@ -266,13 +273,13 @@ bool CWS2812Ctrl::set_pwm_duty(uint32_t duty, bool verbose/*=true*/)
     }
 
     esp_err_t ret;
-    ret = ledc_set_duty(LEDC_HIGH_SPEED_MODE, LEDC_CHANNEL_0, duty);
+    ret = ledc_set_duty(kLedcSpeedMode, LEDC_CHANNEL_0, duty);
     if (ret != ESP_OK) {
         GetLogger(eLogType::Error)->Log("Failed to set ledc duty (ret: %d)", ret);
         return false;
     }
 
-    ret = ledc_update_duty(LEDC_HIGH_SPEED_MODE, LEDC_CHANNEL_0);
+    ret = ledc_update_duty(kLedcSpeedMode, LEDC_CHANNEL_0);
     if (ret != ESP_OK) {
         GetLogger(eLogType::Error)->Log("Failed to set update duty (ret: %d)", ret);
         return false;

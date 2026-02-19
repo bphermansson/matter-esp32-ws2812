@@ -15,7 +15,7 @@ bool CDeviceOnOffLight::matter_add_endpoint()
     esp_matter::node_t *root = GetSystem()->get_root_node();
     esp_matter::endpoint::on_off_light::config_t config_endpoint;
     config_endpoint.on_off.on_off = false;
-    config_endpoint.on_off.lighting.start_up_on_off = nullptr;
+    config_endpoint.on_off_lighting.start_up_on_off = nullptr;
     uint8_t flags = esp_matter::ENDPOINT_FLAG_DESTROYABLE;
     m_endpoint = esp_matter::endpoint::on_off_light::create(root, &config_endpoint, flags, nullptr);
     if (!m_endpoint) {

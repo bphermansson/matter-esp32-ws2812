@@ -1,4 +1,4 @@
-#! /usr/sh
+#!/usr/bin/env bash
 # install_sdk.sh
 # author: seung hee, lee
 # purpose: get 'esp-idf' and 'esp-matter' repository from github
@@ -12,7 +12,7 @@ else
 fi
 
 # sdk_path=${project_path}/sdk
-sdk_path=~/tools  # change to your own sdk path
+sdk_path=/media/patrik/nvm/matter-esp32-ws2812-sdk/tools  # change to your own sdk path
 if ! [ -d "${sdk_path}" ]; then
   mkdir ${sdk_path}
 fi
@@ -23,6 +23,17 @@ esp_matter_path=${sdk_path}/esp-matter
 # for Apple silicon
 if [[ "$OSTYPE" == "darwin"* ]]; then
     export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:"/opt/homebrew/opt/openssl@3/lib/pkgconfig"
+fi
+
+# ESP-IDF install scripts create/manage their own Python venv.
+# If another venv is active, idf_tools.py install-python-env fails.
+if [[ -n "${VIRTUAL_ENV:-}" ]]; then
+  echo "Detected active virtualenv: ${VIRTUAL_ENV}"
+  echo "Deactivating it for ESP-IDF installation..."
+  if declare -F deactivate >/dev/null 2>&1; then
+    deactivate
+  fi
+  unset VIRTUAL_ENV
 fi
 
 # install esp-idf

@@ -6,19 +6,22 @@
             "cppStandard": "c++17",
             "includePath": [
                 "${workspaceFolder}/**",
-				"~/tools/esp-idf/components/**",
-                "~/tools/esp-matter/components/**",
-				"~/tools/esp-matter/connectedhomeip/connectedhomeip/**"
+                "/media/patrik/nvm/matter-esp32-ws2812-sdk/tools/esp-idf/components/**",
+                "/media/patrik/nvm/matter-esp32-ws2812-sdk/tools/esp-matter/components/**",
+                "/media/patrik/nvm/matter-esp32-ws2812-sdk/tools/esp-matter/connectedhomeip/connectedhomeip/**"
             ],
             "browse": {
                 "path": [
                     "${workspaceFolder}/**",
-                    "~/tools/esp-idf/components/**",
-					"~/tools/esp-matter/components/**",
-					"~/tools/esp-matter/connectedhomeip/connectedhomeip/**"
+                    "/media/patrik/nvm/matter-esp32-ws2812-sdk/tools/esp-idf/components/**",
+                    "/media/patrik/nvm/matter-esp32-ws2812-sdk/tools/esp-matter/components/**",
+                    "/media/patrik/nvm/matter-esp32-ws2812-sdk/tools/esp-matter/connectedhomeip/connectedhomeip/**"
                 ],
                 "limitSymbolsToIncludedHeaders": false
-            }
+            },
+            "compileCommands": [
+                "${workspaceFolder}/build/compile_commands.json"
+            ]
         }
     ],
     "version": 4

@@ -28,5 +28,17 @@
         "complex": "cpp",
         "valarray": "cpp",
         "chrono": "cpp"
-    }
+    },
+    "idf.currentSetup": "/media/patrik/nvm/esp-idf",
+    "idf.espIdfPath": "/media/patrik/nvm/esp-idf",
+    "idf.customExtraPaths": "/media/patrik/Extra1TB/Programmering/Esp32/esp-matter/components",
+    "idf.customExtraVars": {
+        "ESP_MATTER_PATH": "/media/patrik/Extra1TB/Programmering/Esp32/esp-matter",
+        "_PW_ACTUAL_ENVIRONMENT_ROOT": "/media/patrik/Extra1TB/Programmering/Esp32/esp-matter/connectedhomeip/connectedhomeip/.environment",
+        "IDF_CCACHE_ENABLE": "1"
+    },
+    "idf.openOcdConfigs": [
+        "board/esp32s3-builtin.cfg"
+    ],
+    "idf.port": "/dev/ttyACM0"
 }

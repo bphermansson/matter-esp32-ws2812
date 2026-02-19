@@ -5,6 +5,13 @@
 #include <esp_matter_endpoint.h>
 #include <esp_matter_attribute_utils.h>
 
+namespace {
+static int remap_to_range(uint8_t value, int src_max, int dst_max)
+{
+    return (static_cast<int>(value) * dst_max) / src_max;
+}
+} // namespace
+
 CDeviceColorControlLight::CDeviceColorControlLight()
 {
     m_matter_update_by_client_clus_onoff_attr_onoff = false;
@@ -21,11 +28,11 @@ bool CDeviceColorControlLight::matter_add_endpoint()
 
     esp_matter::endpoint::extended_color_light::config_t config_endpoint;
     config_endpoint.on_off.on_off = false;
-    config_endpoint.on_off.lighting.start_up_on_off = nullptr;
+    config_endpoint.on_off_lighting.start_up_on_off = nullptr;
     config_endpoint.level_control.current_level = m_state_brightness;
-    config_endpoint.level_control.lighting.min_level = 1;
-    config_endpoint.level_control.lighting.max_level = 254;
-    config_endpoint.level_control.lighting.start_up_current_level = m_state_brightness;
+    config_endpoint.level_control_lighting.min_level = 1;
+    config_endpoint.level_control_lighting.max_level = 254;
+    config_endpoint.level_control_lighting.start_up_current_level = m_state_brightness;
     /**
     * 3.2.7.9. Color Mode Attribute
     * The ColorMode attribute indicates which attributes are currently determining the color of the device.
@@ -134,7 +141,7 @@ void CDeviceColorControlLight::matter_on_change_attribute_value(esp_matter::attr
                 GetLogger(eLogType::Info)->Log("MATTER::PRE_UPDATE >> cluster: ColorControl(0x%04X), attribute: CurrentHue(0x%04X), value: %d", cluster_id, attribute_id, value->val.u8);
                 if (!m_matter_update_by_client_clus_colorcontrol_attr_currenthue) {
                     m_state_hue = value->val.u8;
-                    int temp = REMAP_TO_RANGE(value->val.u8, 254, 360);
+                    int temp = remap_to_range(value->val.u8, 254, 360);
                     GetWS2812Ctrl()->set_hue(temp);
                 } else {
                     m_matter_update_by_client_clus_colorcontrol_attr_currenthue = false;
@@ -143,7 +150,7 @@ void CDeviceColorControlLight::matter_on_change_attribute_value(esp_matter::attr
                 GetLogger(eLogType::Info)->Log("MATTER::PRE_UPDATE >> cluster: ColorControl(0x%04X), attribute: CurrentSaturation(0x%04X), value: %d", cluster_id, attribute_id, value->val.u8);
                 if (!m_matter_update_by_client_clus_colorcontrol_attr_currentsaturation) {
                     m_state_saturation = value->val.u8;
-                    int temp = REMAP_TO_RANGE(value->val.u8, 254, 100);
+                    int temp = remap_to_range(value->val.u8, 254, 100);
                     GetWS2812Ctrl()->set_saturation(temp);
                 } else {
                     m_matter_update_by_client_clus_colorcontrol_attr_currentsaturation = false;

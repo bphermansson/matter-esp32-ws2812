@@ -14,6 +14,7 @@
 #include <esp_app_desc.h>
 #include <app/server/Server.h>
 #include <esp_matter_providers.h>
+#include <button_gpio.h>
 #include "ws2812.h"
 #include "device_onoff_light.h"
 #include "device_levelcontrol_light.h"
@@ -158,25 +159,26 @@ void CSystem::callback_default_button(void *arg, void *data)
 
 bool CSystem::init_default_button()
 {
-    button_config_t cfg = button_config_t();
-    cfg.type = BUTTON_TYPE_GPIO;
+    button_config_t cfg = {};
     cfg.long_press_time = 5000;
     cfg.short_press_time = 180;
-    cfg.gpio_button_config.gpio_num = GPIO_PIN_DEFAULT_BTN;
-    cfg.gpio_button_config.active_level = 0; // active low (zero level when pressed)
 
-    m_handle_default_btn = iot_button_create(&cfg);
-    if (!m_handle_default_btn) {
-        GetLogger(eLogType::Error)->Log("Failed to create iot button");
+    button_gpio_config_t gpio_cfg = {};
+    gpio_cfg.gpio_num = GPIO_PIN_DEFAULT_BTN;
+    gpio_cfg.active_level = 0; // active low (zero level when pressed)
+
+    esp_err_t ret = iot_button_new_gpio_device(&cfg, &gpio_cfg, &m_handle_default_btn);
+    if (ret != ESP_OK || !m_handle_default_btn) {
+        GetLogger(eLogType::Error)->Log("Failed to create iot button (ret: %d)", ret);
         return false;
     }
 
-    iot_button_register_cb(m_handle_default_btn, BUTTON_PRESS_DOWN, callback_default_button, nullptr);
-    iot_button_register_cb(m_handle_default_btn, BUTTON_PRESS_UP, callback_default_button, nullptr);
-    iot_button_register_cb(m_handle_default_btn, BUTTON_SINGLE_CLICK, callback_default_button, nullptr);
-    iot_button_register_cb(m_handle_default_btn, BUTTON_DOUBLE_CLICK, callback_default_button, nullptr);
-    iot_button_register_cb(m_handle_default_btn, BUTTON_LONG_PRESS_START, callback_default_button, nullptr);
-    iot_button_register_cb(m_handle_default_btn, BUTTON_LONG_PRESS_HOLD, callback_default_button, nullptr);
+    iot_button_register_cb(m_handle_default_btn, BUTTON_PRESS_DOWN, nullptr, callback_default_button, nullptr);
+    iot_button_register_cb(m_handle_default_btn, BUTTON_PRESS_UP, nullptr, callback_default_button, nullptr);
+    iot_button_register_cb(m_handle_default_btn, BUTTON_SINGLE_CLICK, nullptr, callback_default_button, nullptr);
+    iot_button_register_cb(m_handle_default_btn, BUTTON_DOUBLE_CLICK, nullptr, callback_default_button, nullptr);
+    iot_button_register_cb(m_handle_default_btn, BUTTON_LONG_PRESS_START, nullptr, callback_default_button, nullptr);
+    iot_button_register_cb(m_handle_default_btn, BUTTON_LONG_PRESS_HOLD, nullptr, callback_default_button, nullptr);
     
     return true;
 }
